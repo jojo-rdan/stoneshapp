@@ -1,0 +1,76 @@
+import type { RecommendationResult } from '@/domains/recommendations/recommendation.types';
+
+export const recommendationResults: RecommendationResult[] = [
+  {
+    id: 'rec-mannshire-catacumbas',
+    profileId: 'profile-alden-guardia',
+    contractId: 'contract-mannshire-catacumbas',
+    presetId: 'preset-seguro-mannshire',
+    summary: 'Preparacion muy estable para una run corta-media con no-muertos y castigo sostenido.',
+    readinessScore: 78,
+    riskAssessment: 'medio',
+    estimatedCost: 410,
+    recommendedItems: [
+      {
+        id: 'rec-vendas',
+        name: 'Vendas',
+        quantity: 'x4',
+        category: 'curacion',
+        priority: 'alta',
+        reason: 'El mayor riesgo del contrato es el desgaste acumulado en peleas largas.',
+      },
+      {
+        id: 'rec-antidoto',
+        name: 'Antidoto',
+        quantity: 'x1',
+        category: 'utilidad',
+        priority: 'media',
+        reason: 'Cubre encuentros puntuales con estados alterados molestos.',
+      },
+      {
+        id: 'rec-raciones',
+        name: 'Comida seca',
+        quantity: 'x2',
+        category: 'comida',
+        priority: 'media',
+        reason: 'Ayuda a sostener la salida si se extiende la exploracion.',
+      },
+    ],
+    warnings: [
+      'No entrar con armadura por debajo de 80% de durabilidad.',
+      'Dejar al menos un hueco libre en inventario para botin valioso.',
+    ],
+    explanation: 'La build aguanta bien, pero el valor del contrato mejora mucho si se limita el gasto de reparacion.',
+  },
+  {
+    id: 'rec-osbrook-bandidos',
+    profileId: 'profile-alden-guardia',
+    contractId: 'contract-osbrook-bandidos',
+    presetId: 'preset-seguro-mannshire',
+    summary: 'Run comoda para farmear, con riesgo bajo si se controla el espacio de inventario.',
+    readinessScore: 86,
+    riskAssessment: 'bajo',
+    estimatedCost: 290,
+    recommendedItems: [
+      {
+        id: 'rec-kit-reparacion',
+        name: 'Kit de reparacion',
+        quantity: 'x1',
+        category: 'reparacion',
+        priority: 'media',
+        reason: 'Permite extender la salida si la ruta da buen botin.',
+      },
+      {
+        id: 'rec-ganzuas',
+        name: 'Ganzuas',
+        quantity: 'x2',
+        category: 'utilidad',
+        priority: 'baja',
+        reason: 'Suma valor esperado sin elevar mucho el gasto.',
+      },
+    ],
+    warnings: ['Evitar sobrecargar el personaje si el objetivo es volver rapido a vender.'],
+    explanation: 'Es un contrato bueno para consolidar recursos sin arriesgar demasiado la build principal.',
+  },
+];
+
