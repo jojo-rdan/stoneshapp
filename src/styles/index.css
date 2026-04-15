@@ -229,6 +229,12 @@ ul {
   width: min(1120px, 100%);
 }
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 .section-block {
   display: flex;
   flex-direction: column;
@@ -286,6 +292,10 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+}
+
+.dashboard-hero__copy {
+  max-width: 72ch;
 }
 
 .button {
@@ -469,6 +479,47 @@ ul {
   gap: 0.75rem;
 }
 
+.dashboard-contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-contract-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.dashboard-contract-item strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.dashboard-contract-item p {
+  color: var(--text-muted);
+}
+
+.dashboard-contract-item span {
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.dashboard-contract-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  background: rgba(184, 134, 75, 0.08);
+}
+
 .text-link {
   color: var(--accent-strong);
   width: fit-content;
@@ -494,6 +545,7 @@ ul {
   }
 
   .stats-grid,
+  .dashboard-grid,
   .card-grid,
   .card-grid--wide,
   .prep-summary-grid {
@@ -509,6 +561,7 @@ ul {
   }
 
   .stats-grid,
+  .dashboard-grid,
   .card-grid,
   .card-grid--wide,
   .prep-summary-grid {
@@ -517,7 +570,12 @@ ul {
 
   .card__header,
   .section-header,
-  .shell-header {
+  .shell-header,
+  .dashboard-contract-item {
     flex-direction: column;
+  }
+
+  .dashboard-contract-item {
+    align-items: flex-start;
   }
 }

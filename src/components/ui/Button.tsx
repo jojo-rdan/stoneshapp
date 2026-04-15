@@ -1,12 +1,16 @@
 import type { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 type ButtonProps = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: ButtonVariant;
   }
 >;
+
+export function getButtonClassName(variant: ButtonVariant = 'primary', className?: string) {
+  return ['button', `button--${variant}`, className].filter(Boolean).join(' ');
+}
 
 export function Button({
   children,
@@ -15,7 +19,7 @@ export function Button({
   variant = 'primary',
   ...props
 }: ButtonProps) {
-  const classes = ['button', `button--${variant}`, className].filter(Boolean).join(' ');
+  const classes = getButtonClassName(variant, className);
 
   return (
     <button
@@ -27,4 +31,3 @@ export function Button({
     </button>
   );
 }
-

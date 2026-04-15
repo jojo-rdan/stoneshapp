@@ -11,3 +11,8 @@ export type QuickNote = {
   body: string;
 };
 
+export type DashboardTip = {
+  id: string;
+  title: string;
+  body: string;
+};
