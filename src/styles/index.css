@@ -235,6 +235,25 @@ ul {
   gap: 1rem;
 }
 
+.profile-layout,
+.history-layout,
+.overlay-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.contract-status-grid,
+.contract-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.contract-detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .section-block {
   display: flex;
   flex-direction: column;
@@ -294,8 +313,38 @@ ul {
   gap: 0.9rem;
 }
 
+.contract-status-card {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.contract-status-card span {
+  display: block;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.contract-status-card strong {
+  font-size: 1.9rem;
+  color: var(--accent-strong);
+}
+
 .dashboard-hero__copy {
   max-width: 72ch;
+}
+
+.contract-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.contract-list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .button {
@@ -372,11 +421,57 @@ ul {
   gap: 0.55rem;
 }
 
+.contract-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contract-card__footer small {
+  color: var(--text-muted);
+}
+
 .detail-list,
 .checklist {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-grid--wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid--toggles {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field__label,
+.prep-summary span {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.form-field small,
+.switch-field small {
+  color: var(--text-muted);
+}
+
+.form-field__error {
+  color: #f1a57f;
 }
 
 .select-field,
@@ -388,11 +483,13 @@ ul {
 
 .select-field span,
 .textarea-field span,
-.prep-summary span {
+.form-field span {
   color: var(--text-muted);
   font-size: 0.92rem;
 }
 
+.form-field input,
+.form-field select,
 .select-field select,
 .textarea-field textarea {
   width: 100%;
@@ -405,6 +502,23 @@ ul {
 
 .textarea-field textarea {
   resize: vertical;
+}
+
+.switch-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.switch-field input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent-strong);
 }
 
 .prep-summary-grid {
@@ -479,6 +593,36 @@ ul {
   gap: 0.75rem;
 }
 
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.result-list__item {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.result-list__item strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.result-list__item p {
+  color: var(--text-muted);
+}
+
 .dashboard-contract-list {
   display: flex;
   flex-direction: column;
@@ -520,6 +664,92 @@ ul {
   background: rgba(184, 134, 75, 0.08);
 }
 
+.profile-list,
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-list__item,
+.history-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.profile-list__item span,
+.history-list__item span,
+.profile-list__item small,
+.history-list__item small {
+  color: var(--text-muted);
+}
+
+.profile-list__item:hover,
+.profile-list__item--active,
+.history-list__item:hover,
+.history-list__item--active {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  background: rgba(184, 134, 75, 0.08);
+}
+
+.overlay-preview {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at top left, rgba(226, 178, 120, 0.08), transparent 30%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.overlay-preview__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(13, 20, 27, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.overlay-preview__panel span,
+.overlay-preview__panel small {
+  color: var(--text-muted);
+}
+
+.overlay-preview__panel strong {
+  font-size: 1.45rem;
+  color: var(--accent-strong);
+}
+
+.overlay-preview__panel--pequeno {
+  width: 180px;
+}
+
+.overlay-preview__panel--medio {
+  width: 220px;
+}
+
+.overlay-preview__panel--grande {
+  width: 280px;
+}
+
 .text-link {
   color: var(--accent-strong);
   width: fit-content;
@@ -546,8 +776,17 @@ ul {
 
   .stats-grid,
   .dashboard-grid,
+  .profile-layout,
+  .history-layout,
+  .overlay-layout,
+  .contract-status-grid,
+  .contract-detail-grid,
+  .contract-filter-panel,
+  .contract-list-grid,
   .card-grid,
   .card-grid--wide,
+  .form-grid,
+  .result-grid,
   .prep-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -562,8 +801,17 @@ ul {
 
   .stats-grid,
   .dashboard-grid,
+  .profile-layout,
+  .history-layout,
+  .overlay-layout,
+  .contract-status-grid,
+  .contract-detail-grid,
+  .contract-filter-panel,
+  .contract-list-grid,
   .card-grid,
   .card-grid--wide,
+  .form-grid,
+  .result-grid,
   .prep-summary-grid {
     grid-template-columns: 1fr;
   }
@@ -571,11 +819,16 @@ ul {
   .card__header,
   .section-header,
   .shell-header,
-  .dashboard-contract-item {
+  .dashboard-contract-item,
+  .contract-card__footer {
     flex-direction: column;
   }
 
   .dashboard-contract-item {
+    align-items: flex-start;
+  }
+
+  .contract-card__footer {
     align-items: flex-start;
   }
 }

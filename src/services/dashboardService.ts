@@ -1,4 +1,4 @@
-import type { DashboardStat, DashboardTip, QuickNote } from '@/types/dashboard';
+import type { DashboardStat, DashboardTip } from '@/types/dashboard';
 import { getContracts } from '@/services/contractsService';
 import { getRunHistory } from '@/services/historyService';
 import { getActivePlayerProfile } from '@/services/profileService';
@@ -31,29 +31,6 @@ export function getDashboardStats(): DashboardStat[] {
       label: 'Preparacion media',
       value: `${averageReadiness}%`,
       hint: 'Promedio mock de resultados del recomendador.',
-    },
-  ];
-}
-
-export function getDashboardNotes(): QuickNote[] {
-  const [nextContract] = getContracts();
-  const activeProfile = getActivePlayerProfile();
-
-  return [
-    {
-      id: 'note-route',
-      title: 'Ruta sugerida',
-      body: `${nextContract.region} sigue siendo la mejor salida corta para ${activeProfile.nickname}.`,
-    },
-    {
-      id: 'note-profile',
-      title: 'Foco del perfil',
-      body: activeProfile.notes,
-    },
-    {
-      id: 'note-recommendation',
-      title: 'Iteracion futura',
-      body: 'El recomendador ya tiene modelo propio; despues podemos sumar scoring y filtros sin rehacer la UI.',
     },
   ];
 }

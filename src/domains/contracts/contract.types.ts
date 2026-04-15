@@ -21,10 +21,15 @@ export type ContractEntry = {
   dangerScore: number;
   rewardGold: number;
   rewardNotes: string;
+  shortDescription: string;
   explanationEs: string;
+  detailedExplanationEs: string;
   tacticalSummary: string;
+  suggestedSteps: string[];
+  expectationsInside: string[];
+  commonMistakes: string[];
+  personalNotes: string;
   recommendedPresetId: string;
   recommendedSupplies: string[];
   enemyTags: string[];
 };
-

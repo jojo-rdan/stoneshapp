@@ -8,3 +8,7 @@ export function getPlayerProfiles(): PlayerProfile[] {
 export function getActivePlayerProfile(): PlayerProfile {
   return playerProfiles.find((profile) => profile.id === activePlayerProfileId) ?? playerProfiles[0];
 }
+
+export function getPlayerProfileById(profileId: string): PlayerProfile | undefined {
+  return playerProfiles.find((profile) => profile.id === profileId);
+}
