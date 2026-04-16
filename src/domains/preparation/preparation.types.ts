@@ -2,6 +2,16 @@ export type PreparationIntent = 'segura' | 'equilibrada' | 'agresiva' | 'explora
 
 export type PreparationSupplyCategory = 'curacion' | 'utilidad' | 'comida' | 'reparacion' | 'escape';
 
+export type PreparationRunType = 'contrato' | 'exploracion' | 'farmeo' | 'jefe';
+
+export type PreparationDistance = 'corta' | 'media' | 'larga';
+
+export type PreparationDungeonType = 'catacumbas' | 'fortin' | 'cripta' | 'ruinas' | 'cueva';
+
+export type PreparationWeapon = 'espada' | 'hacha' | 'lanza' | 'daga' | 'arco' | 'baston';
+
+export type PreparationPlaystyle = 'seguro' | 'equilibrado' | 'arriesgado';
+
 export type PreparationSupplyItem = {
   id: string;
   name: string;
@@ -24,3 +34,30 @@ export type PreparationPreset = {
   fallbackPlan: string;
 };
 
+export type PreparationRunInput = {
+  profileId: string;
+  level: number;
+  build: string;
+  mainWeapon: PreparationWeapon;
+  usesMagic: boolean;
+  runType: PreparationRunType;
+  distance: PreparationDistance;
+  dungeonType: PreparationDungeonType;
+  caravanNearby: boolean;
+  playstyle: PreparationPlaystyle;
+  freeSlots: number;
+};
+
+export type PreparationChecklistItem = {
+  id: string;
+  label: string;
+  reason: string;
+};
+
+export type PreparationChecklistResult = {
+  essentials: PreparationChecklistItem[];
+  recommended: PreparationChecklistItem[];
+  optional: PreparationChecklistItem[];
+  alerts: string[];
+  explanation: string;
+};

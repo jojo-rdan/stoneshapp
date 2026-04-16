@@ -12,6 +12,9 @@ export const runHistoryEntries: RunHistory[] = [
     lootSummary: 'Buen retorno en armas ligeras y piezas vendibles.',
     lessonsLearned: ['El espacio libre en inventario definio la ganancia final.'],
     consumedSupplies: ['Vendas x1', 'Agua x1'],
+    missingItems: ['Kit de reparacion', 'Un hueco extra de inventario'],
+    leftoverItems: ['Ganzuas x1'],
+    observations: ['La ruta fue mas limpia de lo esperado.', 'Se pudo vender rapido al volver.'],
     notes: 'Run comoda, sin picos de riesgo. Buen candidato para repetir con foco economico.',
   },
   {
@@ -25,6 +28,9 @@ export const runHistoryEntries: RunHistory[] = [
     lootSummary: 'Botin aceptable, pero con demasiado gasto de curacion.',
     lessonsLearned: ['Falto resistencia al dolor y sobro peso en utilidades ofensivas.'],
     consumedSupplies: ['Vendajes x4', 'Pomada curativa x2', 'Hierbas x1'],
+    missingItems: ['Comida extra', 'Antitoxina', 'Mas margen de durabilidad'],
+    leftoverItems: ['Consumible ofensivo x2'],
+    observations: ['La build aguanto, pero la preparacion no acompano.', 'La cripta castigo cada error logistico.'],
     notes: 'El problema no fue la ruta sino la falta de margen cuando la run se alargo.',
   },
   {
@@ -38,7 +44,9 @@ export const runHistoryEntries: RunHistory[] = [
     lootSummary: 'Salida interrumpida con progreso parcial.',
     lessonsLearned: ['La retirada temprana salvo equipo, pero falto planear mejor el espacio de carga.'],
     consumedSupplies: ['Vendas x2', 'Comida seca x1'],
+    missingItems: ['Espacios libres', 'Ruta de escape mas clara'],
+    leftoverItems: ['Pomada curativa x1', 'Agua x1'],
+    observations: ['La retirada fue correcta, pero llego tarde.', 'Buen recordatorio de no improvisar inventario.'],
     notes: 'Buen recordatorio de que la logistica importa tanto como el combate.',
   },
 ];
-

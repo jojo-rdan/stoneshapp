@@ -25,7 +25,7 @@ export function ContractSummaryCard({ contract }: ContractSummaryCardProps) {
   return (
     <Card
       title={contract.title}
-      subtitle={`${contract.region} · ${contract.dungeonType}`}
+      subtitle={`${contract.region} · ${contract.locationLabel}`}
       aside={formatContractReward(contract.rewardGold)}
     >
       <div className="contract-card__meta">
@@ -33,13 +33,19 @@ export function ContractSummaryCard({ contract }: ContractSummaryCardProps) {
         <Badge>{contract.status}</Badge>
         <Badge>Riesgo {contract.dangerScore}/5</Badge>
       </div>
+
+      <p>{contract.shortDescription}</p>
       <p className="muted-copy">{contract.tacticalSummary}</p>
-      <Link
-        className="text-link"
-        to={buildContractDetailPath(contract.id)}
-      >
-        Ver detalle del contrato
-      </Link>
+
+      <div className="contract-card__footer">
+        <small>Lo entrega: {contract.issuer}</small>
+        <Link
+          className="text-link"
+          to={buildContractDetailPath(contract.id)}
+        >
+          Abrir guia del contrato
+        </Link>
+      </div>
     </Card>
   );
 }

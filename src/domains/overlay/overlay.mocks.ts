@@ -2,9 +2,13 @@ import type { OverlaySettings } from '@/domains/overlay/overlay.types';
 
 export const overlaySettingsMock: OverlaySettings = {
   id: 'overlay-default',
+  enabled: true,
   mode: 'compacto',
   anchor: 'top-right',
   opacity: 82,
+  size: 'medio',
+  showDayPhase: true,
+  showEstimatedTime: true,
   use24HourClock: true,
   sessionReminderMinutes: 45,
   pinActiveContract: true,

@@ -11,6 +11,8 @@ export type RunHistory = {
   lootSummary: string;
   lessonsLearned: string[];
   consumedSupplies: string[];
+  missingItems: string[];
+  leftoverItems: string[];
+  observations: string[];
   notes: string;
 };
-

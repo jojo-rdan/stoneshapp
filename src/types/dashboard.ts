@@ -5,12 +5,6 @@ export type DashboardStat = {
   hint: string;
 };
 
-export type QuickNote = {
-  id: string;
-  title: string;
-  body: string;
-};
-
 export type DashboardTip = {
   id: string;
   title: string;
