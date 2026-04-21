@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tauri Prep"
+  short_description: "Prepare Stoneshapp for Tauri"
+  default_prompt: "Use $tauri-prep to evolve Stoneshapp's desktop foundation without coupling the frontend to Tauri."
+
+policy:
+  allow_implicit_invocation: true

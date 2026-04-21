@@ -1,0 +1,7 @@
+interface:
+  display_name: "Refactor Safe"
+  short_description: "Clean Stoneshapp without regressions"
+  default_prompt: "Use $refactor-safe to simplify or rename code in Stoneshapp without changing behavior."
+
+policy:
+  allow_implicit_invocation: true

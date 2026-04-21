@@ -109,6 +109,12 @@ Guia detallada:
 
 - [docs/desktop-evolution.md](docs/desktop-evolution.md)
 
+## Skills de Codex
+
+El repo incluye skills locales en [`.codex/skills`](</c:/Users/jorda/OneDrive/Documents/repos/stoneshapp/.codex/skills:1>) para tareas frecuentes de Stoneshapp.
+
+- [docs/codex-skills.md](docs/codex-skills.md)
+
 ## Estado actual del MVP visual
 
 - Dashboard con resumen rapido, tips y accesos principales

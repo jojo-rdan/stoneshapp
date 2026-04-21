@@ -1,0 +1,7 @@
+interface:
+  display_name: "Domain Modeling"
+  short_description: "Model Stoneshapp business types"
+  default_prompt: "Use $domain-modeling to define or evolve a Stoneshapp domain model and its mocks."
+
+policy:
+  allow_implicit_invocation: true
