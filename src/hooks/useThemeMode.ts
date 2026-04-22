@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
-
-const THEME_STORAGE_KEY = 'stoneshapp-theme';
+import { localStorageAdapter, STORAGE_KEYS } from '@/shared/storage';
 
 export function useThemeMode() {
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) ?? 'dark';
+    const storedTheme = localStorageAdapter.getItem(STORAGE_KEYS.theme) ?? 'dark';
     document.documentElement.dataset.theme = storedTheme;
   }, []);
 }
-

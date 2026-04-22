@@ -1,6 +1,6 @@
-import { overlaySettingsMock } from '@/domains/overlay/overlay.mocks';
-import type { OverlaySettings } from '@/domains/overlay/overlay.types';
-
-export function getOverlaySettings(): OverlaySettings {
-  return overlaySettingsMock;
-}
+export {
+  getOverlaySettings,
+  resetOverlaySettings,
+  setOverlaySettings,
+  updateOverlaySettings,
+} from '@/features/overlay/services/overlaySettingsService';

@@ -6,7 +6,7 @@ import { SwitchField } from '@/components/forms/SwitchField';
 import type { OverlayAnchor, OverlayMode, OverlaySettings, OverlaySize } from '@/domains/overlay/overlay.types';
 import { OverlayPreviewCard } from '@/features/overlay/components/OverlayPreviewCard';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { getOverlaySettings } from '@/services/overlayService';
+import { getOverlaySettings, updateOverlaySettings } from '@/services/overlayService';
 
 export function OverlaySettingsPage() {
   useDocumentTitle('Overlay');
@@ -14,10 +14,7 @@ export function OverlaySettingsPage() {
   const [overlaySettings, setOverlaySettings] = useState<OverlaySettings>(getOverlaySettings());
 
   function updateOverlay<K extends keyof OverlaySettings>(field: K, value: OverlaySettings[K]) {
-    setOverlaySettings((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setOverlaySettings(updateOverlaySettings({ [field]: value }));
   }
 
   return (

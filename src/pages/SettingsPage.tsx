@@ -5,7 +5,7 @@ import { FormField } from '@/components/forms/FormField';
 import { SwitchField } from '@/components/forms/SwitchField';
 import type { AppLanguage, AppSettingsState, AppTheme, LocalDataMode } from '@/domains/settings/settings.types';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { getAppSettings } from '@/services/settingsService';
+import { getAppSettings, updateAppSettings } from '@/services/settingsService';
 
 export function SettingsPage() {
   useDocumentTitle('Configuración');
@@ -13,10 +13,7 @@ export function SettingsPage() {
   const [settings, setSettings] = useState<AppSettingsState>(getAppSettings());
 
   function updateSettings<K extends keyof AppSettingsState>(field: K, value: AppSettingsState[K]) {
-    setSettings((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setSettings(updateAppSettings({ [field]: value }));
   }
 
   return (

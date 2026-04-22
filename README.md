@@ -109,6 +109,12 @@ Guia detallada:
 
 - [docs/desktop-evolution.md](docs/desktop-evolution.md)
 
+## Persistencia local
+
+La primera capa de datos locales ya esta separada de la UI con repositorios por dominio y un adapter basado en `localStorage`.
+
+- [docs/local-persistence.md](docs/local-persistence.md)
+
 ## Skills de Codex
 
 El repo incluye skills locales en [`.codex/skills`](</c:/Users/jorda/OneDrive/Documents/repos/stoneshapp/.codex/skills:1>) para tareas frecuentes de Stoneshapp.
