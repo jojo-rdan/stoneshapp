@@ -21,12 +21,12 @@ export function OverlaySettingsPage() {
     <div className="page-stack">
       <Section
         title="Controles del overlay"
-        description="Configuracion mock del gadget de tiempo para el MVP visual."
+        description="Configuracion local del gadget de tiempo para el MVP visual."
       >
         <div className="overlay-layout">
           <Card
             title="Ajustes"
-            subtitle="Controles listos para conectar persistencia despues."
+            subtitle="Los cambios se guardan en este dispositivo."
           >
             <div className="form-grid form-grid--wide">
               <SwitchField

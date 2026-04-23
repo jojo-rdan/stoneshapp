@@ -619,6 +619,12 @@ ul {
   margin-bottom: 0.3rem;
 }
 
+.result-list__item small {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--accent-strong);
+}
+
 .result-list__item p {
   color: var(--text-muted);
 }

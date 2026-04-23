@@ -13,7 +13,12 @@ export function SettingsPage() {
   const [settings, setSettings] = useState<AppSettingsState>(getAppSettings());
 
   function updateSettings<K extends keyof AppSettingsState>(field: K, value: AppSettingsState[K]) {
-    setSettings(updateAppSettings({ [field]: value }));
+    const nextSettings = updateAppSettings({ [field]: value });
+    setSettings(nextSettings);
+
+    if (field === 'theme') {
+      document.documentElement.dataset.theme = String(value);
+    }
   }
 
   return (
@@ -25,7 +30,7 @@ export function SettingsPage() {
         <div className="card-grid card-grid--wide">
           <Card
             title="Preferencias de la app"
-            subtitle="Todo en estado local y mock por ahora."
+            subtitle="Estos cambios se guardan en este dispositivo."
           >
             <div className="form-grid">
               <FormField label="Idioma">

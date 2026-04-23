@@ -42,6 +42,7 @@ export type PreparationRunInput = {
   usesMagic: boolean;
   runType: PreparationRunType;
   distance: PreparationDistance;
+  dungeonKnown: boolean;
   dungeonType: PreparationDungeonType;
   caravanNearby: boolean;
   playstyle: PreparationPlaystyle;
@@ -51,6 +52,9 @@ export type PreparationRunInput = {
 export type PreparationChecklistItem = {
   id: string;
   label: string;
+  quantity?: string;
+  category?: string;
+  severity?: string;
   reason: string;
 };
 

@@ -19,7 +19,15 @@ export function ChecklistBucketCard({ title, subtitle, items }: ChecklistBucketC
             key={item.id}
             className="result-list__item"
           >
-            <strong>{item.label}</strong>
+            <strong>
+              {item.label}
+              {item.quantity ? ` ${item.quantity}` : ''}
+            </strong>
+            {(item.category || item.severity) && (
+              <small>
+                {[item.category, item.severity].filter(Boolean).join(' - ')}
+              </small>
+            )}
             <p>{item.reason}</p>
           </li>
         ))}

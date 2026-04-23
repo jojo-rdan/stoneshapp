@@ -115,6 +115,12 @@ La primera capa de datos locales ya esta separada de la UI con repositorios por 
 
 - [docs/local-persistence.md](docs/local-persistence.md)
 
+## Recommendation engine
+
+La preparacion de salidas ya usa un motor v1 basado en reglas locales, sin IA y desacoplado de React.
+
+- [docs/recommendation-engine.md](docs/recommendation-engine.md)
+
 ## Skills de Codex
 
 El repo incluye skills locales en [`.codex/skills`](</c:/Users/jorda/OneDrive/Documents/repos/stoneshapp/.codex/skills:1>) para tareas frecuentes de Stoneshapp.
