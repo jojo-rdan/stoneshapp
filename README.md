@@ -1,6 +1,13 @@
 # Stoneshapp
 
-Stoneshapp es una companion app en espanol para **Stoneshard**. El MVP actual esta enfocado en una base frontend limpia, modular y preparada para evolucionar a desktop app con Tauri sin mezclar UI, dominio y capacidades nativas antes de tiempo.
+Stoneshapp es una companion app en español para **Stoneshard**. El proyecto está centrado en ayudar al jugador a preparar salidas, entender contratos, registrar aprendizaje manual después de cada run y dejar una base limpia para evolucionar a desktop app con Tauri.
+
+Sprint 2 deja resueltas cuatro bases importantes:
+
+- recommendation engine v1 por reglas, sin IA
+- persistencia local desacoplada de la UI
+- contratos separados entre catálogo curado y progreso del jugador
+- historial de runs como loop de aprendizaje manual
 
 ## Stack
 
@@ -9,9 +16,10 @@ Stoneshapp es una companion app en espanol para **Stoneshard**. El MVP actual es
 - Vite
 - React Router
 - CSS plano con variables y componentes reutilizables
+- Vitest para tests unitarios
 - Base preparada para Tauri
 
-## Como ejecutar el proyecto
+## Cómo ejecutar
 
 Instalar dependencias:
 
@@ -19,128 +27,152 @@ Instalar dependencias:
 npm install
 ```
 
-Levantar entorno de desarrollo:
+Desarrollo:
 
 ```bash
 npm run dev
 ```
 
-Generar build de produccion:
+Tests:
+
+```bash
+npm run test
+```
+
+Modo watch para tests:
+
+```bash
+npm run test:watch
+```
+
+Typecheck:
+
+```bash
+npm run typecheck
+```
+
+Build:
 
 ```bash
 npm run build
 ```
 
-Previsualizar la build:
+Preview de la build:
 
 ```bash
 npm run preview
 ```
 
-Ejecutar el shell desktop con Tauri:
+Shell desktop con Tauri:
 
 ```bash
 npm run tauri dev
 ```
 
 Nota para Windows + PowerShell:
-si la politica de ejecucion bloquea `npm`, usa `npm.cmd run dev`, `npm.cmd run build`, etc.
+si la política de ejecución bloquea `npm`, usa `npm.cmd run dev`, `npm.cmd run test`, etc.
 
-Nota tras instalar Rust:
-si acabas de instalar `rustup`, reinicia la terminal o el IDE para que `cargo` entre al `PATH` de nuevas sesiones.
-
-## Estructura de carpetas
+## Estructura principal
 
 ```text
 stoneshapp/
 |-- docs/
-|   `-- desktop-evolution.md
+|   |-- codex-skills.md
+|   |-- desktop-evolution.md
+|   |-- local-persistence.md
+|   `-- recommendation-engine.md
 |-- src/
-|   |-- app/
-|   |-- components/
-|   |-- data/
-|   |-- domains/
-|   |-- features/
+|   |-- app/                  # bootstrap, rutas, metadata de pantallas
+|   |-- components/           # UI reusable y campos de formulario
+|   |-- content/              # contenido curado estable del juego
+|   |-- domains/              # tipos, enums, mocks y contratos de negocio
+|   |-- features/             # módulos por dominio/producto
 |   |-- hooks/
-|   |-- integrations/
-|   |   `-- desktop/
+|   |-- integrations/desktop/ # frontera web-safe hacia capacidades desktop
 |   |-- layouts/
-|   |-- pages/
-|   |-- services/
+|   |-- pages/                # pantallas conectadas al router
+|   |-- services/             # fachadas para consumo desde pages/features
+|   |-- shared/storage/       # base persistente desacoplada
 |   |-- styles/
-|   `-- types/
+|   `-- test/                 # helpers de test compartidos
 |-- src-tauri/
-|   |-- capabilities/
-|   `-- src/
-|-- index.html
 |-- package.json
-|-- tsconfig.app.json
-|-- tsconfig.json
-|-- tsconfig.node.json
 `-- vite.config.ts
 ```
 
-## Guia rapida de arquitectura
+## Arquitectura de storage
 
-- `src/domains`: tipos, unions, enums, mocks y modelos del negocio.
-- `src/services`: acceso a datos mock y logica ligera desacoplada de la UI.
-- `src/features`: piezas funcionales por modulo del producto.
-- `src/pages`: pantallas conectadas al router.
-- `src/components`: base visual reutilizable.
-- `src/integrations/desktop`: contratos y adapters para capacidades desktop.
-- `src-tauri`: shell nativo, ventanas, permisos y comandos Rust.
+La persistencia local usa una capa común en `src/shared/storage`.
 
-## Preparacion para Tauri
+- `persistentResource.ts`: lectura/escritura genérica con envelope versionado
+- `collectionRepository.ts`: CRUD para colecciones
+- `singletonRepository.ts`: CRUD para estados singleton
+- `localStorageAdapter.ts`: adapter inicial sobre `localStorage` con fallback en memoria
+- `storageKeys.ts`: claves centralizadas por dominio
 
-El proyecto ya incluye una base minima para desktop:
+Sobre esa base, cada dominio define su propio repositorio:
 
-- `vite.config.ts` preparado para convivir con `tauri dev`
-- `src-tauri/` con configuracion inicial y ventana principal
-- `src/integrations/desktop/` como frontera para futuras APIs nativas
+- perfiles
+- presets de preparación
+- progreso de contratos
+- historial de runs
+- overlay settings
+- app settings
 
-Prerrequisitos del entorno para que `npm run tauri dev` funcione:
+La UI nunca accede a `localStorage` directamente. `pages/` y `features/` consumen servicios tipados desde `src/services`.
 
-- Rust y Cargo disponibles en el `PATH`
-- toolchain `stable-msvc`
-- Microsoft C++ Build Tools
-- WebView2
+## Arquitectura del recommendation engine
 
-Guia detallada:
+El engine vive en `src/features/dungeon-prep/recommendation-engine` y está separado de React.
 
-- [docs/desktop-evolution.md](docs/desktop-evolution.md)
+- `types.ts`: input/output y contratos del motor
+- `helpers.ts`: acumulación, deduplicación y summary final
+- `rules/`: reglas modulares por preocupación
+- `index.ts`: API pública con `generatePreparationRecommendation`
+- `adapters.ts`: puente entre formularios de preparación y resultado UI
 
-## Persistencia local
+Las reglas actuales están separadas por:
 
-La primera capa de datos locales ya esta separada de la UI con repositorios por dominio y un adapter basado en `localStorage`.
+- seguridad base
+- build/arma
+- ruta y distancia
+- tipo de dungeon
+- inventario
+- estilo de juego
+- tipo de salida
+
+El objetivo es que futuras versiones del engine puedan cambiar reglas o pesos sin reescribir la pantalla `Preparar salida`.
+
+## Estado de Sprint 2
+
+- Dashboard conectado a datos persistidos y módulos reales del MVP
+- Preparar salida conectado al recommendation engine v1 y presets persistidos
+- Contratos con catálogo curado separado del progreso del jugador
+- Historial de runs con registro de feedback post-run y resúmenes básicos
+- Perfil, overlay y configuración conectados a persistencia local
+- Base desktop preparada para seguir creciendo con Tauri
+
+## Tests incluidos
+
+La suite actual cubre zonas críticas de Sprint 2:
+
+- recommendation engine v1
+- reglas principales del engine
+- helpers y adapters del engine
+- storage genérico con migración
+- servicios de persistencia de presets, contratos e historial
+- filtros básicos del módulo de contratos
+
+## Documentación relacionada
 
 - [docs/local-persistence.md](docs/local-persistence.md)
-
-## Recommendation engine
-
-La preparacion de salidas ya usa un motor v1 basado en reglas locales, sin IA y desacoplado de React.
-
 - [docs/recommendation-engine.md](docs/recommendation-engine.md)
-
-## Skills de Codex
-
-El repo incluye skills locales en [`.codex/skills`](</c:/Users/jorda/OneDrive/Documents/repos/stoneshapp/.codex/skills:1>) para tareas frecuentes de Stoneshapp.
-
+- [docs/desktop-evolution.md](docs/desktop-evolution.md)
 - [docs/codex-skills.md](docs/codex-skills.md)
 
-## Estado actual del MVP visual
+## Próximos pasos naturales
 
-- Dashboard con resumen rapido, tips y accesos principales
-- Preparar salida con formulario, validacion basica y checklist mock
-- Contratos con lista, filtros, detalle guiado y acciones mock
-- Perfil con perfiles guardados y detalle del seleccionado
-- Historial con runs previas, faltantes, sobrantes y observaciones
-- Overlay settings con controles mock y preview simple
-- Configuracion con preferencias base del MVP
-
-## Proximos pasos
-
-- Instalar el CLI de Tauri y validar el shell desktop end-to-end
-- Reemplazar bridges desktop mock por implementaciones reales
-- Mover el overlay experimental a un modulo nativo desacoplado
-- Anadir persistencia local para perfiles, notas, contratos y settings
-- Cubrir servicios de dominio y reglas de recomendacion con tests
+- usar el historial para influir en recomendaciones futuras de forma explicable
+- seguir reduciendo contenido mock residual en dashboard y módulos secundarios
+- preparar tests adicionales para páginas con más lógica local
+- conectar persistencia desktop real cuando la capa Tauri/SQLite entre en juego

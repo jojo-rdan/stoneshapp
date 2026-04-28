@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   clearScreen: false,
@@ -18,5 +18,11 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+  },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+    restoreMocks: true,
+    clearMocks: true,
   },
 });

@@ -2,8 +2,13 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Section } from '@/components/ui/Section';
-import type { ContractCatalogView, ContractRegion, PlayerContractStatus } from '@/domains/contracts/contract.types';
+import type { ContractCatalogView, ContractRegion } from '@/domains/contracts/contract.types';
 import { ContractSummaryCard } from '@/features/contracts/components/ContractSummaryCard';
+import {
+  filterContractCatalogViews,
+  type ContractStatusFilter,
+  type ContractViewMode,
+} from '@/features/contracts/services/contractCatalogFilters';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import {
   createPlayerContractFromCatalog,
@@ -13,9 +18,6 @@ import {
   getContractStatusSummary,
   getTrackedContractViews,
 } from '@/services/contractsService';
-
-type ContractViewMode = 'catalogo' | 'activos' | 'seguimiento';
-type ContractStatusFilter = 'todos' | 'sin-seguimiento' | PlayerContractStatus;
 
 export function ContractsPage() {
   useDocumentTitle('Contratos');
@@ -42,33 +44,12 @@ export function ContractsPage() {
   }
 
   const filteredContracts = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    const scopedContracts =
-      viewMode === 'catalogo'
-        ? contracts
-        : viewMode === 'activos'
-          ? contracts.filter(
-              (contract) =>
-                contract.progress && (contract.progress.status === 'activo' || contract.progress.status === 'pausado'),
-            )
-          : contracts.filter((contract) => contract.isTracked);
-
-    return scopedContracts.filter((contract) => {
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        contract.catalog.name.toLowerCase().includes(normalizedQuery) ||
-        contract.catalog.issuerNpc.toLowerCase().includes(normalizedQuery) ||
-        contract.catalog.simpleDescription.toLowerCase().includes(normalizedQuery) ||
-        contract.catalog.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery)) ||
-        (contract.progress?.userNotes.toLowerCase().includes(normalizedQuery) ?? false);
-
-      const matchesStatus =
-        selectedStatus === 'todos' ||
-        (selectedStatus === 'sin-seguimiento' && !contract.isTracked) ||
-        contract.playerStatus === selectedStatus;
-      const matchesRegion = selectedRegion === 'todos' || contract.catalog.region === selectedRegion;
-
-      return matchesQuery && matchesStatus && matchesRegion;
+    return filterContractCatalogViews({
+      contracts,
+      viewMode,
+      searchQuery,
+      selectedStatus,
+      selectedRegion,
     });
   }, [contracts, searchQuery, selectedRegion, selectedStatus, viewMode]);
 
