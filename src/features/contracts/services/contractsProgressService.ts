@@ -1,81 +1,182 @@
-import { contractEntries } from '@/domains/contracts/contract.mocks';
-import type { ContractEntry, ContractRegion, ContractStatus } from '@/domains/contracts/contract.types';
+import { contractCatalog } from '@/content/contracts/contractCatalog';
+import type {
+  ContractCatalogEntry,
+  ContractCatalogView,
+  ContractRegion,
+  PlayerContractProgress,
+  PlayerContractStatus,
+} from '@/domains/contracts/contract.types';
 import { contractsProgressRepository } from '@/features/contracts/repositories/contractsProgressRepository';
-import type { ContractProgressEntry } from '@/features/contracts/types/contractProgress.types';
 
 export type ContractStatusSummary = {
-  status: ContractStatus;
+  status: PlayerContractStatus;
   label: string;
   count: number;
 };
 
-function applyProgress(contract: ContractEntry, progress?: ContractProgressEntry): ContractEntry {
+function buildContractView(
+  catalogEntry: ContractCatalogEntry,
+  progress?: PlayerContractProgress,
+): ContractCatalogView {
   return {
-    ...contract,
-    status: progress?.status ?? contract.status,
-    personalNotes: progress?.personalNotes ?? contract.personalNotes,
-    suggestedSteps: [...contract.suggestedSteps],
-    expectationsInside: [...contract.expectationsInside],
-    commonMistakes: [...contract.commonMistakes],
-    recommendedSupplies: [...contract.recommendedSupplies],
-    enemyTags: [...contract.enemyTags],
+    catalog: {
+      ...catalogEntry,
+      steps: [...catalogEntry.steps],
+      whatToExpect: [...catalogEntry.whatToExpect],
+      commonMistakes: [...catalogEntry.commonMistakes],
+      tags: [...catalogEntry.tags],
+    },
+    progress: progress
+      ? {
+          ...progress,
+        }
+      : undefined,
+    playerStatus: progress?.status ?? 'sin-seguimiento',
+    isTracked: Boolean(progress),
   };
 }
 
-export function getContracts(): ContractEntry[] {
+function getStatusLabel(status: PlayerContractStatus): string {
+  if (status === 'activo') {
+    return 'Activos';
+  }
+
+  if (status === 'pausado') {
+    return 'Pausados';
+  }
+
+  if (status === 'completado') {
+    return 'Completados';
+  }
+
+  return 'Fallidos';
+}
+
+export function getContractCatalog(): ContractCatalogEntry[] {
+  return contractCatalog.map((entry) => ({
+    ...entry,
+    steps: [...entry.steps],
+    whatToExpect: [...entry.whatToExpect],
+    commonMistakes: [...entry.commonMistakes],
+    tags: [...entry.tags],
+  }));
+}
+
+export function getContractCatalogById(contractCatalogId: string): ContractCatalogEntry | undefined {
+  return getContractCatalog().find((entry) => entry.id === contractCatalogId);
+}
+
+export function getContractCatalogViews(): ContractCatalogView[] {
   const progressEntries = contractsProgressRepository.findAll();
 
-  return contractEntries.map((contract) =>
-    applyProgress(
-      contract,
-      progressEntries.find((progress) => progress.contractId === contract.id),
+  return getContractCatalog().map((entry) =>
+    buildContractView(
+      entry,
+      progressEntries.find((progress) => progress.contractCatalogId === entry.id),
     ),
   );
 }
 
-export function getContractById(contractId: string): ContractEntry | undefined {
-  const contract = contractEntries.find((entry) => entry.id === contractId);
+export function getContractViewById(contractCatalogId: string): ContractCatalogView | undefined {
+  const catalogEntry = getContractCatalogById(contractCatalogId);
 
-  if (!contract) {
+  if (!catalogEntry) {
     return undefined;
   }
 
-  return applyProgress(contract, contractsProgressRepository.findByContractId(contractId));
+  return buildContractView(catalogEntry, contractsProgressRepository.findByCatalogId(contractCatalogId));
 }
 
 export function getContractRegions(): ContractRegion[] {
-  return [...new Set(getContracts().map((contract) => contract.region))];
+  return [...new Set(contractCatalog.map((entry) => entry.region))];
+}
+
+export function getPlayerContractProgressEntries(): PlayerContractProgress[] {
+  return contractsProgressRepository.findAll();
+}
+
+export function getActivePlayerContracts(): ContractCatalogView[] {
+  return getContractCatalogViews().filter(
+    (entry) => entry.progress && (entry.progress.status === 'activo' || entry.progress.status === 'pausado'),
+  );
+}
+
+export function getTrackedContractViews(): ContractCatalogView[] {
+  return getContractCatalogViews().filter((entry) => entry.isTracked);
 }
 
 export function getContractStatusSummary(): ContractStatusSummary[] {
-  const contracts = getContracts();
-  const definitions: Array<{ status: ContractStatus; label: string }> = [
-    { status: 'disponible', label: 'Disponibles' },
-    { status: 'seguimiento', label: 'En seguimiento' },
-    { status: 'completado', label: 'Completados' },
-  ];
+  const progressEntries = getPlayerContractProgressEntries();
+  const definitions: PlayerContractStatus[] = ['activo', 'pausado', 'completado', 'fallido'];
 
-  return definitions.map((definition) => ({
-    ...definition,
-    count: contracts.filter((contract) => contract.status === definition.status).length,
+  return definitions.map((status) => ({
+    status,
+    label: getStatusLabel(status),
+    count: progressEntries.filter((entry) => entry.status === status).length,
   }));
 }
 
-export function updateContractStatus(contractId: string, nextStatus: ContractStatus): ContractEntry | undefined {
-  contractsProgressRepository.updateStatus(contractId, nextStatus);
-  return getContractById(contractId);
+export function createPlayerContractFromCatalog(contractCatalogId: string): ContractCatalogView | undefined {
+  const catalogEntry = getContractCatalogById(contractCatalogId);
+
+  if (!catalogEntry) {
+    return undefined;
+  }
+
+  contractsProgressRepository.create({
+    contractCatalogId,
+    status: 'activo',
+  });
+
+  return getContractViewById(contractCatalogId);
 }
 
-export function updateContractPersonalNotes(contractId: string, personalNotes: string): ContractEntry | undefined {
-  contractsProgressRepository.updatePersonalNotes(contractId, personalNotes);
-  return getContractById(contractId);
+export function updatePlayerContractStatus(
+  contractCatalogId: string,
+  nextStatus: PlayerContractStatus,
+): ContractCatalogView | undefined {
+  const progress = contractsProgressRepository.findByCatalogId(contractCatalogId);
+
+  if (!progress) {
+    const createdView = createPlayerContractFromCatalog(contractCatalogId);
+
+    if (!createdView?.progress) {
+      return createdView;
+    }
+
+    contractsProgressRepository.updateStatus(createdView.progress.id, nextStatus);
+    return getContractViewById(contractCatalogId);
+  }
+
+  contractsProgressRepository.updateStatus(progress.id, nextStatus);
+  return getContractViewById(contractCatalogId);
 }
 
-export function resetContractsProgress(): ContractEntry[] {
+export function updatePlayerContractNotes(
+  contractCatalogId: string,
+  userNotes: string,
+): ContractCatalogView | undefined {
+  const progress = contractsProgressRepository.findByCatalogId(contractCatalogId);
+
+  if (!progress) {
+    const createdProgress = contractsProgressRepository.create({
+      contractCatalogId,
+      status: 'activo',
+      userNotes,
+    });
+
+    return getContractViewById(createdProgress.contractCatalogId);
+  }
+
+  contractsProgressRepository.updateNotes(progress.id, userNotes);
+  return getContractViewById(contractCatalogId);
+}
+
+export function resetContractsProgress(): ContractCatalogView[] {
   contractsProgressRepository.reset();
-  return getContracts();
+  return getContractCatalogViews();
 }
 
-export function formatContractReward(rewardGold: number): string {
-  return `${rewardGold.toLocaleString('es-CO')} coronas`;
+export function formatContractReward(estimatedRewardGold: number): string {
+  return `${estimatedRewardGold.toLocaleString('es-CO')} coronas`;
 }

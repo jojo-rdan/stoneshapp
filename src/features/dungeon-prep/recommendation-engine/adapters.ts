@@ -38,7 +38,13 @@ export function mapRecommendationToChecklistResult(result: RecommendationResult)
     essentials: result.essentials.map(mapRecommendationItem),
     recommended: result.recommended.map(mapRecommendationItem),
     optional: result.optional.map(mapRecommendationItem),
-    alerts: result.alerts.map((alert) => `${alert.label} ${alert.explanation}`),
+    alerts: result.alerts.map((alert) => ({
+      id: alert.id,
+      label: alert.label,
+      category: alert.category,
+      severity: alert.severity,
+      reason: alert.explanation,
+    })),
     explanation: result.summary,
   };
 }

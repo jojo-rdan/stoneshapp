@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
 import { appRoutes, buildContractDetailPath } from '@/app/routes';
 import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
 import { getButtonClassName } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { Section } from '@/components/ui/Section';
 import { StatCard } from '@/components/ui/StatCard';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { formatContractReward, getContracts } from '@/services/contractsService';
+import { formatContractReward, getActivePlayerContracts, getContractCatalogViews } from '@/services/contractsService';
 import { getDashboardBeginnerTips, getDashboardStats } from '@/services/dashboardService';
-import { getRunHistory } from '@/services/historyService';
+import { formatRunHistoryDate, getRunHistory } from '@/services/historyService';
 import { getOverlaySettings } from '@/services/overlayService';
 import { getActivePlayerProfile } from '@/services/profileService';
 import { getPreparationPresetById } from '@/services/preparationService';
@@ -19,10 +19,11 @@ export function DashboardPage() {
 
   const stats = getDashboardStats();
   const activeProfile = getActivePlayerProfile();
-  const recentContracts = getContracts().slice(0, 3);
+  const trackedContracts = getActivePlayerContracts();
+  const recentContracts = (trackedContracts.length > 0 ? trackedContracts : getContractCatalogViews()).slice(0, 3);
   const featuredContract = recentContracts[0];
   const latestChecklistPreset = getPreparationPresetById(activeProfile.activePreparationPresetId);
-  const latestRecommendation = featuredContract ? getRecommendationForContract(featuredContract.id) : undefined;
+  const latestRecommendation = featuredContract ? getRecommendationForContract(featuredContract.catalog.id) : undefined;
   const overlaySettings = getOverlaySettings();
   const tips = getDashboardBeginnerTips();
   const latestRun = getRunHistory()[0];
@@ -100,7 +101,7 @@ export function DashboardPage() {
           <ul className="detail-list">
             <li>{latestChecklistPreset.supplies.length} suministros base sugeridos</li>
             <li>{latestChecklistPreset.checklist.length} pasos en la checklist</li>
-            <li>Contrato asociado: {featuredContract.title}</li>
+            <li>Contrato asociado: {featuredContract.catalog.name}</li>
           </ul>
         </Card>
 
@@ -111,15 +112,15 @@ export function DashboardPage() {
           <div className="dashboard-contract-list">
             {recentContracts.map((contract) => (
               <Link
-                key={contract.id}
+                key={contract.catalog.id}
                 className="dashboard-contract-item"
-                to={buildContractDetailPath(contract.id)}
+                to={buildContractDetailPath(contract.catalog.id)}
               >
                 <div>
-                  <strong>{contract.title}</strong>
-                  <p>{contract.region} · {contract.dungeonType}</p>
+                  <strong>{contract.catalog.name}</strong>
+                  <p>{contract.catalog.region} · {contract.catalog.objectiveType}</p>
                 </div>
-                <span>{formatContractReward(contract.rewardGold)}</span>
+                <span>{formatContractReward(contract.catalog.estimatedRewardGold)}</span>
               </Link>
             ))}
           </div>
@@ -136,7 +137,9 @@ export function DashboardPage() {
             <li>Widgets activos: {overlaySettings.widgets.filter((widget) => widget.enabled).length}</li>
           </ul>
           <p className="muted-copy">
-            Ultima salida registrada: {latestRun.runLabel} · {latestRun.dateLabel}
+            {latestRun
+              ? `Ultima salida registrada: ${latestRun.label} · ${formatRunHistoryDate(latestRun.date)}`
+              : 'Aun no hay una salida registrada en el historial.'}
           </p>
           <Link
             className={getButtonClassName('ghost')}

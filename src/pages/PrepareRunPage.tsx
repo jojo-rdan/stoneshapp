@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -18,6 +19,7 @@ import type {
   PreparationWeapon,
   PreparationSupplyItem,
   PreparationSupplyCategory,
+  PreparationChecklistAlert,
 } from '@/domains/preparation/preparation.types';
 import { ChecklistBucketCard } from '@/features/dungeon-prep/components/ChecklistBucketCard';
 import {
@@ -95,6 +97,16 @@ function createInitialForm(profile: PlayerProfile): PreparationRunInput {
     playstyle: mapPlaystyle(profile.playstyle),
     freeSlots: 4,
   };
+}
+
+function createFormFromProfile(profile: PlayerProfile): PreparationRunInput {
+  const activePreset = getPreparationPresetById(profile.activePreparationPresetId);
+  return activePreset?.runConfiguration
+    ? {
+        ...activePreset.runConfiguration,
+        profileId: profile.id,
+      }
+    : createInitialForm(profile);
 }
 
 function validateForm(form: PreparationRunInput): PreparationFormErrors {
@@ -182,7 +194,20 @@ function createPresetFromForm(
     fallbackPlan: form.caravanNearby
       ? 'Si el gasto sube demasiado, volver a la caravana y reevaluar consumibles.'
       : 'Si la run se alarga, cortar antes de comprometer curacion clave.',
+    runConfiguration: { ...form },
   };
+}
+
+function getSeverityTone(severity?: string): 'neutral' | 'warning' | 'success' {
+  if (severity === 'critica' || severity === 'alta') {
+    return 'warning';
+  }
+
+  if (severity === 'baja') {
+    return 'success';
+  }
+
+  return 'neutral';
 }
 
 export function PrepareRunPage() {
@@ -192,7 +217,7 @@ export function PrepareRunPage() {
   const [presets, setPresets] = useState<PreparationPreset[]>(getPreparationPresets());
   const persistedActiveProfile = profiles.length > 0 ? getActivePlayerProfile() : undefined;
   const activeProfile = profiles.find((profile) => profile.id === persistedActiveProfile?.id) ?? profiles[0];
-  const [form, setForm] = useState<PreparationRunInput | null>(activeProfile ? createInitialForm(activeProfile) : null);
+  const [form, setForm] = useState<PreparationRunInput | null>(activeProfile ? createFormFromProfile(activeProfile) : null);
   const [presetName, setPresetName] = useState(activeProfile ? `Preset ${activeProfile.nickname}` : '');
   const [errors, setErrors] = useState<PreparationFormErrors>({});
   const [result, setResult] = useState<PreparationChecklistResult | null>(null);
@@ -230,7 +255,7 @@ export function PrepareRunPage() {
 
     if (nextProfile) {
       setForm((current) => ({
-        ...createInitialForm(nextProfile),
+        ...createFormFromProfile(nextProfile),
         ...(current?.profileId === nextProfile.id ? current : {}),
         profileId: nextProfile.id,
       }));
@@ -244,7 +269,7 @@ export function PrepareRunPage() {
       return;
     }
 
-    setForm(createInitialForm(nextProfile));
+    setForm(createFormFromProfile(nextProfile));
     setPresetName(`Preset ${nextProfile.nickname}`);
     setErrors({});
     setResult(null);
@@ -271,7 +296,7 @@ export function PrepareRunPage() {
     const nextProfile = profiles.find((profile) => profile.id === preset.profileId) ?? selectedProfile;
 
     setForm({
-      ...createInitialForm(nextProfile),
+      ...preset.runConfiguration,
       profileId: preset.profileId,
     });
     setPresetName(preset.name);
@@ -321,7 +346,7 @@ export function PrepareRunPage() {
       >
         <Card
           title="Formulario de preparacion"
-          subtitle={`Perfil activo actual: ${activeProfile.nickname}`}
+          subtitle={`Perfil activo actual: ${activeProfile.nickname}${activePreset ? ` · preset activo: ${activePreset.name}` : ''}`}
         >
           <div className="form-grid">
             <FormField
@@ -563,9 +588,21 @@ export function PrepareRunPage() {
               title="Alertas"
               subtitle="Senales que el motor detecta antes de salir."
             >
-              <ul className="detail-list">
+              <ul className="result-list">
                 {result.alerts.length > 0 ? (
-                  result.alerts.map((alert) => <li key={alert}>{alert}</li>)
+                  result.alerts.map((alert: PreparationChecklistAlert) => (
+                    <li
+                      key={alert.id}
+                      className="result-list__item"
+                    >
+                      <strong>{alert.label}</strong>
+                      <div className="result-list__badges">
+                        <Badge tone={getSeverityTone(alert.severity)}>{alert.severity}</Badge>
+                        <Badge>{alert.category}</Badge>
+                      </div>
+                      <p>{alert.reason}</p>
+                    </li>
+                  ))
                 ) : (
                   <li>Sin alertas fuertes para esta salida.</li>
                 )}

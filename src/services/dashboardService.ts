@@ -1,24 +1,28 @@
 import type { DashboardStat, DashboardTip } from '@/types/dashboard';
-import { getContracts } from '@/services/contractsService';
-import { getRunHistory } from '@/services/historyService';
+import { getActivePlayerContracts, getTrackedContractViews } from '@/services/contractsService';
+import { formatRunHistoryDate, getRunHistory } from '@/services/historyService';
 import { getActivePlayerProfile } from '@/services/profileService';
 import { getRecommendationResults } from '@/services/recommendationService';
 
 export function getDashboardStats(): DashboardStat[] {
-  const contracts = getContracts();
+  const activeContracts = getActivePlayerContracts();
+  const trackedContracts = getTrackedContractViews();
   const activeProfile = getActivePlayerProfile();
   const recommendations = getRecommendationResults();
-  const averageReadiness = Math.round(
-    recommendations.reduce((accumulator, result) => accumulator + result.readinessScore, 0) /
-      recommendations.length,
-  );
+  const averageReadiness =
+    recommendations.length > 0
+      ? Math.round(
+          recommendations.reduce((accumulator, result) => accumulator + result.readinessScore, 0) /
+            recommendations.length,
+        )
+      : 0;
 
   return [
     {
       id: 'active-contracts',
       label: 'Contratos activos',
-      value: `${contracts.length}`,
-      hint: 'Base inicial del tracker para el MVP.',
+      value: `${activeContracts.length}`,
+      hint: `${trackedContracts.length} contratos con seguimiento guardado localmente.`,
     },
     {
       id: 'profile-build',
@@ -50,13 +54,15 @@ export function getDashboardBeginnerTips(): DashboardTip[] {
       id: 'tip-follow-recommendation',
       title: 'Empieza por lo prioritario',
       body: firstRecommendation
-        ? `El recomendador ya marca prioridades altas para no sobrecomprar antes de salir.`
+        ? 'El recomendador ya marca prioridades altas para no sobrecomprar antes de salir.'
         : 'Empieza por curacion, comida y una via clara de retirada.',
     },
     {
       id: 'tip-review-history',
       title: 'Aprende de la ultima salida',
-      body: `Revisa ${latestRun.runLabel} para detectar que consumibles realmente se gastaron y cuales sobraron.`,
+      body: latestRun
+        ? `Revisa ${latestRun.label} del ${formatRunHistoryDate(latestRun.date)} para detectar que realmente faltó o sobró.`
+        : 'Empieza a registrar runs para convertir la memoria reciente en mejoras concretas.',
     },
   ];
 }

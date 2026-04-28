@@ -1,69 +1,62 @@
-import { contractEntries } from '@/domains/contracts/contract.mocks';
-import type { ContractStatus } from '@/domains/contracts/contract.types';
+import type { PlayerContractProgress, PlayerContractStatus } from '@/domains/contracts/contract.types';
 import type {
-  ContractProgressEntry,
-  UpdateContractProgressInput,
+  CreatePlayerContractProgressInput,
+  UpdatePlayerContractProgressInput,
 } from '@/features/contracts/types/contractProgress.types';
-import { createCollectionRepository, STORAGE_KEYS, STORAGE_SCHEMA_VERSION } from '@/shared/storage';
+import {
+  createCollectionRepository,
+  createLocalId,
+  STORAGE_KEYS,
+  STORAGE_SCHEMA_VERSION,
+} from '@/shared/storage';
 
-function createProgressFromSeed(): ContractProgressEntry[] {
-  const now = new Date().toISOString();
-
-  return contractEntries.map((contract) => ({
-    id: contract.id,
-    contractId: contract.id,
-    status: contract.status,
-    personalNotes: contract.personalNotes,
-    updatedAt: now,
-  }));
-}
-
-const progressCollectionRepository = createCollectionRepository<ContractProgressEntry>({
-  key: STORAGE_KEYS.contractsProgress,
+const playerContractProgressCollection = createCollectionRepository<PlayerContractProgress>({
+  key: STORAGE_KEYS.playerContractProgress,
   schemaVersion: STORAGE_SCHEMA_VERSION,
-  seed: createProgressFromSeed,
+  seed: () => [],
 });
 
-function ensureProgress(contractId: string): ContractProgressEntry {
-  const existingProgress = progressCollectionRepository.findById(contractId);
-
-  if (existingProgress) {
-    return existingProgress;
-  }
-
-  const matchingContract = contractEntries.find((contract) => contract.id === contractId);
-
-  return progressCollectionRepository.create({
-    id: contractId,
-    contractId,
-    status: matchingContract?.status ?? 'disponible',
-    personalNotes: matchingContract?.personalNotes ?? '',
-    updatedAt: new Date().toISOString(),
-  });
-}
-
 export const contractsProgressRepository = {
-  findAll(): ContractProgressEntry[] {
-    return progressCollectionRepository.findAll();
+  findAll(): PlayerContractProgress[] {
+    return playerContractProgressCollection.findAll();
   },
-  findByContractId(contractId: string): ContractProgressEntry | undefined {
-    return progressCollectionRepository.findById(contractId);
+  findById(progressId: string): PlayerContractProgress | undefined {
+    return playerContractProgressCollection.findById(progressId);
   },
-  update(contractId: string, updates: UpdateContractProgressInput): ContractProgressEntry {
-    ensureProgress(contractId);
+  findByCatalogId(contractCatalogId: string): PlayerContractProgress | undefined {
+    return playerContractProgressCollection.findAll().find((entry) => entry.contractCatalogId === contractCatalogId);
+  },
+  create(input: CreatePlayerContractProgressInput): PlayerContractProgress {
+    const existingProgress = contractsProgressRepository.findByCatalogId(input.contractCatalogId);
 
-    return progressCollectionRepository.update(contractId, {
+    if (existingProgress) {
+      return existingProgress;
+    }
+
+    const timestamp = new Date().toISOString();
+
+    return playerContractProgressCollection.create({
+      id: createLocalId('player-contract'),
+      contractCatalogId: input.contractCatalogId,
+      status: input.status ?? 'activo',
+      userNotes: input.userNotes ?? '',
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
+  },
+  update(progressId: string, updates: UpdatePlayerContractProgressInput): PlayerContractProgress | undefined {
+    return playerContractProgressCollection.update(progressId, {
       ...updates,
       updatedAt: new Date().toISOString(),
-    }) as ContractProgressEntry;
+    });
   },
-  updateStatus(contractId: string, status: ContractStatus): ContractProgressEntry {
-    return contractsProgressRepository.update(contractId, { status });
+  updateStatus(progressId: string, status: PlayerContractStatus): PlayerContractProgress | undefined {
+    return contractsProgressRepository.update(progressId, { status });
   },
-  updatePersonalNotes(contractId: string, personalNotes: string): ContractProgressEntry {
-    return contractsProgressRepository.update(contractId, { personalNotes });
+  updateNotes(progressId: string, userNotes: string): PlayerContractProgress | undefined {
+    return contractsProgressRepository.update(progressId, { userNotes });
   },
-  reset(): ContractProgressEntry[] {
-    return progressCollectionRepository.reset();
+  reset(): PlayerContractProgress[] {
+    return playerContractProgressCollection.reset();
   },
 };

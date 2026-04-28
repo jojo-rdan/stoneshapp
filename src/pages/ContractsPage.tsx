@@ -1,43 +1,82 @@
 import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Section } from '@/components/ui/Section';
-import type { ContractRegion, ContractStatus } from '@/domains/contracts/contract.types';
+import type { ContractCatalogView, ContractRegion, PlayerContractStatus } from '@/domains/contracts/contract.types';
 import { ContractSummaryCard } from '@/features/contracts/components/ContractSummaryCard';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { getContracts, getContractRegions, getContractStatusSummary } from '@/services/contractsService';
+import {
+  createPlayerContractFromCatalog,
+  getActivePlayerContracts,
+  getContractCatalogViews,
+  getContractRegions,
+  getContractStatusSummary,
+  getTrackedContractViews,
+} from '@/services/contractsService';
+
+type ContractViewMode = 'catalogo' | 'activos' | 'seguimiento';
+type ContractStatusFilter = 'todos' | 'sin-seguimiento' | PlayerContractStatus;
 
 export function ContractsPage() {
   useDocumentTitle('Contratos');
 
-  const contracts = getContracts();
+  const [contracts, setContracts] = useState<ContractCatalogView[]>(getContractCatalogViews());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<ContractStatusFilter>('todos');
+  const [selectedRegion, setSelectedRegion] = useState<'todos' | ContractRegion>('todos');
+  const [viewMode, setViewMode] = useState<ContractViewMode>('catalogo');
+
   const statusSummary = getContractStatusSummary();
   const regions = getContractRegions();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<'todos' | ContractStatus>('todos');
-  const [selectedRegion, setSelectedRegion] = useState<'todos' | ContractRegion>('todos');
+  const activeContracts = getActivePlayerContracts();
+  const trackedContracts = getTrackedContractViews();
+
+  function refreshContracts(nextViewMode: ContractViewMode = viewMode) {
+    setContracts(getContractCatalogViews());
+    setViewMode(nextViewMode);
+  }
+
+  function handleTrackContract(catalogId: string) {
+    createPlayerContractFromCatalog(catalogId);
+    refreshContracts('activos');
+  }
 
   const filteredContracts = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
+    const scopedContracts =
+      viewMode === 'catalogo'
+        ? contracts
+        : viewMode === 'activos'
+          ? contracts.filter(
+              (contract) =>
+                contract.progress && (contract.progress.status === 'activo' || contract.progress.status === 'pausado'),
+            )
+          : contracts.filter((contract) => contract.isTracked);
 
-    return contracts.filter((contract) => {
+    return scopedContracts.filter((contract) => {
       const matchesQuery =
         normalizedQuery.length === 0 ||
-        contract.title.toLowerCase().includes(normalizedQuery) ||
-        contract.issuer.toLowerCase().includes(normalizedQuery) ||
-        contract.shortDescription.toLowerCase().includes(normalizedQuery);
+        contract.catalog.name.toLowerCase().includes(normalizedQuery) ||
+        contract.catalog.issuerNpc.toLowerCase().includes(normalizedQuery) ||
+        contract.catalog.simpleDescription.toLowerCase().includes(normalizedQuery) ||
+        contract.catalog.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery)) ||
+        (contract.progress?.userNotes.toLowerCase().includes(normalizedQuery) ?? false);
 
-      const matchesStatus = selectedStatus === 'todos' || contract.status === selectedStatus;
-      const matchesRegion = selectedRegion === 'todos' || contract.region === selectedRegion;
+      const matchesStatus =
+        selectedStatus === 'todos' ||
+        (selectedStatus === 'sin-seguimiento' && !contract.isTracked) ||
+        contract.playerStatus === selectedStatus;
+      const matchesRegion = selectedRegion === 'todos' || contract.catalog.region === selectedRegion;
 
       return matchesQuery && matchesStatus && matchesRegion;
     });
-  }, [contracts, searchQuery, selectedRegion, selectedStatus]);
+  }, [contracts, searchQuery, selectedRegion, selectedStatus, viewMode]);
 
   return (
     <div className="page-stack">
       <Section
-        title="Resumen del tablero"
-        description="Vista rapida para entender cuantos contratos estan disponibles y en que punto va cada uno."
+        title="Seguimiento del jugador"
+        description="Separa claramente el catalogo curado del juego y tu progreso real sobre esos contratos."
       >
         <div className="contract-status-grid">
           {statusSummary.map((item) => (
@@ -50,18 +89,39 @@ export function ContractsPage() {
             </article>
           ))}
         </div>
+
+        <div className="button-row">
+          <Button
+            variant={viewMode === 'catalogo' ? 'primary' : 'secondary'}
+            onClick={() => setViewMode('catalogo')}
+          >
+            Catalogo curado
+          </Button>
+          <Button
+            variant={viewMode === 'activos' ? 'primary' : 'secondary'}
+            onClick={() => setViewMode('activos')}
+          >
+            Activos del jugador ({activeContracts.length})
+          </Button>
+          <Button
+            variant={viewMode === 'seguimiento' ? 'primary' : 'secondary'}
+            onClick={() => setViewMode('seguimiento')}
+          >
+            Todo mi seguimiento ({trackedContracts.length})
+          </Button>
+        </div>
       </Section>
 
       <Section
         title="Buscar y filtrar"
-        description="Encuentra rapido un contrato por nombre, estado o pueblo."
+        description="Filtra por estado del jugador, pueblo o texto para convertir la guia en una herramienta real de sesion."
       >
         <div className="contract-filter-panel">
           <label className="form-field">
             <span className="form-field__label">Buscador</span>
             <input
               type="text"
-              placeholder="Busca por contrato, NPC o descripcion"
+              placeholder="Busca por contrato, NPC, tag o nota"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
             />
@@ -71,12 +131,14 @@ export function ContractsPage() {
             <span className="form-field__label">Estado</span>
             <select
               value={selectedStatus}
-              onChange={(event) => setSelectedStatus(event.target.value as 'todos' | ContractStatus)}
+              onChange={(event) => setSelectedStatus(event.target.value as ContractStatusFilter)}
             >
               <option value="todos">todos</option>
-              <option value="disponible">disponible</option>
-              <option value="seguimiento">seguimiento</option>
+              <option value="sin-seguimiento">sin-seguimiento</option>
+              <option value="activo">activo</option>
+              <option value="pausado">pausado</option>
               <option value="completado">completado</option>
+              <option value="fallido">fallido</option>
             </select>
           </label>
 
@@ -101,22 +163,29 @@ export function ContractsPage() {
       </Section>
 
       <Section
-        title="Lista de contratos"
-        description="Cada tarjeta esta pensada como una mini guia amigable, no solo como un registro frio."
+        title={
+          viewMode === 'catalogo'
+            ? 'Catalogo de contratos'
+            : viewMode === 'activos'
+              ? 'Contratos activos del jugador'
+              : 'Historial de seguimiento'
+        }
+        description="Cada tarjeta combina la guia curada del juego con el estado real del jugador sin convertirlo en una tabla fria."
       >
         {filteredContracts.length > 0 ? (
           <div className="contract-list-grid">
             {filteredContracts.map((contract) => (
               <ContractSummaryCard
-                key={contract.id}
+                key={contract.catalog.id}
                 contract={contract}
+                onTrack={handleTrackContract}
               />
             ))}
           </div>
         ) : (
           <EmptyState
             title="No hay contratos con esos filtros"
-            description="Prueba cambiando el pueblo, el estado o el texto del buscador para volver a ver resultados."
+            description="Prueba otro estado, cambia de pueblo o vuelve al catalogo completo para retomar el hilo."
           />
         )}
       </Section>

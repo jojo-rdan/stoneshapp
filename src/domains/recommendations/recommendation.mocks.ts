@@ -4,7 +4,7 @@ export const recommendationResults: RecommendationResult[] = [
   {
     id: 'rec-mannshire-catacumbas',
     profileId: 'profile-alden-guardia',
-    contractId: 'contract-mannshire-catacumbas',
+    contractId: 'catalog-mannshire-east-catacombs',
     presetId: 'preset-seguro-mannshire',
     summary: 'Preparacion muy estable para una run corta-media con no-muertos y castigo sostenido.',
     readinessScore: 78,
@@ -45,7 +45,7 @@ export const recommendationResults: RecommendationResult[] = [
   {
     id: 'rec-osbrook-bandidos',
     profileId: 'profile-alden-guardia',
-    contractId: 'contract-osbrook-bandidos',
+    contractId: 'catalog-osbrook-north-bandits',
     presetId: 'preset-seguro-mannshire',
     summary: 'Run comoda para farmear, con riesgo bajo si se controla el espacio de inventario.',
     readinessScore: 86,
@@ -73,4 +73,3 @@ export const recommendationResults: RecommendationResult[] = [
     explanation: 'Es un contrato bueno para consolidar recursos sin arriesgar demasiado la build principal.',
   },
 ];
-

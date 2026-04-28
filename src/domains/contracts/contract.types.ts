@@ -1,35 +1,39 @@
 export type ContractRegion = 'Osbrook' | 'Mannshire' | 'Brynn';
 
-export type ContractDungeonType = 'catacumbas' | 'fortin' | 'cripta' | 'ruinas';
+export type ContractObjectiveType = 'limpieza' | 'bandidos' | 'reliquia' | 'caza' | 'investigacion';
 
-export type ContractStatus = 'disponible' | 'seguimiento' | 'completado';
+export type ContractNovicePriority = 'alta' | 'media' | 'baja' | 'evitar';
 
-export type ContractPriority = 'alta' | 'media' | 'baja';
+export type PlayerContractStatus = 'activo' | 'completado' | 'fallido' | 'pausado';
 
-export type ContractDangerTier = 'bajo' | 'medio' | 'alto' | 'letal';
-
-export type ContractEntry = {
+export type ContractCatalogEntry = {
   id: string;
-  title: string;
-  issuer: string;
+  name: string;
   region: ContractRegion;
-  locationLabel: string;
-  dungeonType: ContractDungeonType;
-  status: ContractStatus;
-  priority: ContractPriority;
-  dangerTier: ContractDangerTier;
-  dangerScore: number;
-  rewardGold: number;
-  rewardNotes: string;
-  shortDescription: string;
-  explanationEs: string;
-  detailedExplanationEs: string;
-  tacticalSummary: string;
-  suggestedSteps: string[];
-  expectationsInside: string[];
+  issuerNpc: string;
+  objectiveType: ContractObjectiveType;
+  simpleDescription: string;
+  detailedDescription: string;
+  steps: string[];
+  whatToExpect: string[];
   commonMistakes: string[];
-  personalNotes: string;
-  recommendedPresetId: string;
-  recommendedSupplies: string[];
-  enemyTags: string[];
+  estimatedRewardGold: number;
+  tags: string[];
+  novicePriority?: ContractNovicePriority;
+};
+
+export type PlayerContractProgress = {
+  id: string;
+  contractCatalogId: string;
+  status: PlayerContractStatus;
+  userNotes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ContractCatalogView = {
+  catalog: ContractCatalogEntry;
+  progress?: PlayerContractProgress;
+  playerStatus: PlayerContractStatus | 'sin-seguimiento';
+  isTracked: boolean;
 };

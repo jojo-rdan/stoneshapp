@@ -32,6 +32,7 @@ export type PreparationPreset = {
   supplies: PreparationSupplyItem[];
   checklist: string[];
   fallbackPlan: string;
+  runConfiguration: PreparationRunInput;
 };
 
 export type PreparationRunInput = {
@@ -58,10 +59,18 @@ export type PreparationChecklistItem = {
   reason: string;
 };
 
+export type PreparationChecklistAlert = {
+  id: string;
+  label: string;
+  category: string;
+  severity: string;
+  reason: string;
+};
+
 export type PreparationChecklistResult = {
   essentials: PreparationChecklistItem[];
   recommended: PreparationChecklistItem[];
   optional: PreparationChecklistItem[];
-  alerts: string[];
+  alerts: PreparationChecklistAlert[];
   explanation: string;
 };

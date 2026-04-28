@@ -1,11 +1,11 @@
-import type { ContractStatus } from '@/domains/contracts/contract.types';
+import type { PlayerContractProgress, PlayerContractStatus } from '@/domains/contracts/contract.types';
 
-export type ContractProgressEntry = {
-  id: string;
-  contractId: string;
-  status: ContractStatus;
-  personalNotes: string;
-  updatedAt: string;
+export type CreatePlayerContractProgressInput = {
+  contractCatalogId: string;
+  status?: PlayerContractStatus;
+  userNotes?: string;
 };
 
-export type UpdateContractProgressInput = Partial<Pick<ContractProgressEntry, 'status' | 'personalNotes'>>;
+export type UpdatePlayerContractProgressInput = Partial<
+  Pick<PlayerContractProgress, 'status' | 'userNotes'>
+>;

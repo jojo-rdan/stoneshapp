@@ -1,11 +1,17 @@
 export {
+  createPlayerContractFromCatalog,
   formatContractReward,
-  getContractById,
+  getActivePlayerContracts,
   getContractRegions,
-  getContracts,
+  getContractCatalog,
+  getContractCatalogById,
+  getContractCatalogViews,
   getContractStatusSummary,
+  getContractViewById,
+  getPlayerContractProgressEntries,
+  getTrackedContractViews,
   resetContractsProgress,
-  updateContractPersonalNotes,
-  updateContractStatus,
+  updatePlayerContractNotes,
+  updatePlayerContractStatus,
 } from '@/features/contracts/services/contractsProgressService';
 export type { ContractStatusSummary } from '@/features/contracts/services/contractsProgressService';
